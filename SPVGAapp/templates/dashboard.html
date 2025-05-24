@@ -1,6 +1,120 @@
 <!DOCTYPE html>
 <html lang="es" class="h-100">
   <head>
-    {% load static %}
-    </head>
+    {% load static %} 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>{{ title }}</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+</head>
+<body class="h-100">
+
+    <div id="loader" class="d-none position-relative h-100">
+        <div class="loadingio-spinner-interwind-5ha72ylfyjj position-absolute top-50 start-50 translate-middle">
+            <div class="ldio-euc1l366ixa"><div><div><div><div></div></div><div><div><div></div></div></div></div></div></div>
+        </div>
+    </div>
+
+    <div id="dialog" class="container-all d-none">
+        <div class="popup">
+            <div class="imgpop"></div>
+            <div class="container-text">
+                <h1></h1>
+                <p></p>
+                <button id="close-dlg" class="btn btn-light btn-lg" type="button">¡Entendido!</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="h-100">
+        <div class="row row-no-gutters h-100">
+            <div class="col-xs-12 col-md-4 text-white sidebar">
+                <span>
+                    <p class="text-center title">SPVGA</p>
+                    <p class="text-center subtitle">Sistema Politécnico para Vinculación de Grupos Académicos</p>
+                    <img class="img1" src="{% static 'img/guys.svg' %}" alt="guys">
+                </span>
+            </div>
+
+            <div class="col-xs-12 col-md-8 formulario h-form">
+                <div id="btn-bot" class="align-top my-3 mx-4">
+                    <a href="https://wa.me/525516793456" target="_blank">
+                        <i class="bi bi-robot support text-dark"></i>
+                    </a>
+                </div>
+
+                <form class="position_top">
+                    <div class="row align-items-center m-5">
+                        <div class="col-xs-12 col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" type="text" name="name" placeholder=" " required pattern="([a-zA-Zà-ÿÀ-Ÿ]+ ){2}([a-zA-Zà-ÿÀ-Ÿ]+[ ]?){1,5}" title="Incluye tu nombre completo empezando por tu apellido paterno">
+                                <label>Nombre Completo</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" type="tel" name="phone" placeholder=" " required pattern="[0-9]{10}" title="Incluye 10 dígitos en el número telefónico">
+                                <label>Teléfono</label>
+                            </div>
+                            <div class="form-floating d-none">
+                                <input class="form-control" type="email" name="email" placeholder=" ">
+                                <label>Correo</label>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6">
+                            <div>
+                                <label class="form-label">Comprobante</label>
+                                <input class="form-control" type="file" name="inscription" accept="application/pdf" disabled>
+                            </div>
+                            <input id="btnSubmit" type="submit" name="btnSubmit" hidden>
+                        </div>
+                    </div>
+                    <!-- Botón de envío oculto -->
+                    <!-- <button class="btn btn-lg btn-primary w-100 mx-0 mb-2" type="submit">Enviar</button> -->
+                </form>
+
+                <div class="text-center align-bottom position-btn-down bottom-0" style="width:inherit">
+                    <a class="text-decoration-none" href="#about">
+                        <p class="text-center m-0 text-dark">¿Qué es esto?</p>
+                        <i class="bi bi-chevron-down text-dark"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="about" class="ajust bg-primary m-0 w-100">
+            <div class="row mb-3 h-100 justify-content-around">
+                <div class="col-md-8">
+                    <p class="text-white text2">
+                        Una aplicación web, que permite a los estudiantes del IPN, encontrar y registrarse en grupos de Whatsapp, que corresponden a la tira de materias registradas en su comprobante de inscripción del semestre en curso, con el fin de facilitar la comunicación entre los estudiantes a lo largo del periodo escolar.
+                    </p>
+                </div>
+                <div class="col-6 col-md-4 intam">
+                    <img class="img2 w-100 h-100" src="{% static 'img/img2.png' %}" alt="información">
+                </div>
+            </div>
+            <div class="col-12 social d2">
+                <div class="d-flex justify-content-around m-2">
+                    <div class="p2 text-center">
+                        <a class="text-decoration-none" href="https://www.ipn.mx/" target="_blank">
+                            <img class="icon_size" src="{% static 'img/ipn.png' %}" alt="IPN">
+                            <p class="icons text-black">IPN</p>
+                        </a>
+                    </div>
+                    <div class="p2 text-center">
+                        <a class="text-decoration-none" href="https://www.facebook.com/Gray-Matter-106397525142671" target="_blank">
+                            <img class="icon_size" src="{% static 'img/GM.png' %}" alt="Gray Matter">
+                            <p class="icons text-black">Gray Matter</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{% static 'js/InscriptionDecoder.js' %}"></script>
+    <script src="{% static 'js/mind.js' %}"></script>
+</body>
 </html>
