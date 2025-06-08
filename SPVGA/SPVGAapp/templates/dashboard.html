@@ -47,7 +47,9 @@
                     </a>
                 </div>
 
-                <form class="position_top">
+                <form class="position_top" method="post" enctype="multipart/form-data" action="">
+                    
+                    {% csrf_token %}
                     <div class="row align-items-center m-5">
                         <div class="col-xs-12 col-md-6">
                             <div class="form-floating mb-3">
@@ -55,7 +57,7 @@
                                 <label>Nombre Completo</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input class="form-control" type="tel" name="phone" placeholder=" " required pattern="[0-9]{10}" title="Incluye 10 dígitos en el número telefónico">
+                                <input class="form-control" type="text" name="phone" placeholder=" " required pattern="[0-9]{10}" title="Incluye 10 dígitos en el número telefónico">
                                 <label>Teléfono</label>
                             </div>
                             <div class="form-floating d-none">
@@ -66,13 +68,14 @@
                         <div class="col-xs-12 col-md-6">
                             <div>
                                 <label class="form-label">Comprobante</label>
-                                <input class="form-control" type="file" name="inscription" accept="application/pdf" disabled>
+                                <input class="form-control" type="file" name="inscription" accept="application/pdf" required
+                                       title="Sube tu comprobante de inscripción en formato PDF. Asegúrate de que el archivo no exceda los 5 MB y que sea legible.">
                             </div>
                             <input id="btnSubmit" type="submit" name="btnSubmit" hidden>
                         </div>
                     </div>
                     <!-- Botón de envío oculto -->
-                    <!-- <button class="btn btn-lg btn-primary w-100 mx-0 mb-2" type="submit">Enviar</button> -->
+                    <button class="btn btn-lg btn-primary w-100 mx-0 mb-2" type="submit">Enviar</button>
                 </form>
 
                 <div class="text-center align-bottom position-btn-down bottom-0" style="width:inherit">
@@ -105,16 +108,13 @@
                     </div>
                     <div class="p2 text-center">
                         <a class="text-decoration-none" href="https://www.facebook.com/Gray-Matter-106397525142671" target="_blank">
-                            <img class="icon_size" src="{% static 'img/GM.png' %}" alt="Gray Matter">
-                            <p class="icons text-black">Gray Matter</p>
+                            <img class="icon_size" src="{% static 'img/ceci.jpeg' %}" alt="CECyT5">
+                            <p class="icons text-black">CECyT5</p>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-
-    <script src="{% static 'js/InscriptionDecoder.js' %}"></script>
-    <script src="{% static 'js/mind.js' %}"></script>
 </body>
 </html>
