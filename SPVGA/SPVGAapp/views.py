@@ -9,10 +9,15 @@ from PyPDF2 import PdfReader
 import re
 import pandas as pd
 from time import sleep
+from .models import WhatsAppGroup
 
 def dashboard_view(request):
-    print("Received request in dashboard_view")
-    print("Request method:", request.method)
+
+    if request.method == 'GET':
+        return render(request, 'dashboard.html', {
+        'title': 'SPVGA'
+    })
+
     if request.method == 'POST':
         print("POST request received in dashboard_view")
         # Obtener campos del formulario
@@ -71,24 +76,55 @@ def dashboard_view(request):
         # seleccionar solo un registro para prueba
         horarios = horarios.head(1)
 
-        # Enviar solicitud a Node.js para crear grupo
         try:
             for group in horarios.itertuples(index=False):
-                print(f"Procesando grupo: {group}")
                 group_name = f"{group.Grupo} - {group.Materia}"
                 description = f"*Grupo:* {group.Grupo}\n*Materia:* {group.Materia}\n*Profesor:* {group.Profesor}\n*Horario:* {', '.join(group.Horario)}"
-                payload = {
-                    'nombre_grupo': group_name,
-                    'miembros': [f'52{phone}'],  # Se asume que son números de México (52)
-                    'descripcion': description,
-                }
-                print(f"Enviando solicitud a Node.js con payload: {payload}")
-                requests.post('http://localhost:3000/crear_grupo', json=payload)
-                sleep(5)
+                alumno = f"52{phone}"
+                
+                # 1) ¿Ya existe este grupo en BD?
+                wa_group, creado = WhatsAppGroup.objects.get_or_create(
+                    nombre=group_name,
+                    defaults={'whatsapp_id': None}
+                )
+
+                if creado or not wa_group.whatsapp_id:
+                    # a) Lo creamos en WhatsApp
+                    payload = {
+                        'nombre_grupo': group_name,
+                        'miembros': [alumno],
+                        'descripcion': description,
+                    }
+                    res = requests.post('http://localhost:3000/crear_grupo', json=payload)
+                    data = res.json()
+                    print("Response from WhatsApp API:", data)
+
+                    if data.get('status') == 'ok' and data.get('group_id'):
+                        wa_group.nombre = group_name
+                        wa_group.whatsapp_id = data.get('group_id')
+                        print(f"Grupo creado: {wa_group.nombre} con ID {wa_group.whatsapp_id}")
+                        wa_group.save()
+                    else:
+                        print(f"Error al crear grupo: {data.get('mensaje', 'No se pudo crear el grupo')}")
+                        # manejar error...
+                        continue
+                else:
+                    print(f"Grupo ya existe: {wa_group.nombre} con ID {wa_group.whatsapp_id}")
+                    # b) Ya existe: agregamos solo al alumno
+                    payload = {
+                        'group_id': wa_group.whatsapp_id,
+                        'miembros': [alumno],
+                    }
+                    requests.post('http://localhost:3000/agregar_participantes', json=payload)
+
+            # … limpieza de PDF …
+            if default_storage.exists(pdf_path):
+                default_storage.delete(pdf_path)
+            return JsonResponse({'status':'ok'})
         except Exception as e:
-            return JsonResponse({'status': 'error', 'mensaje': f'Error enviando a WhatsApp: {str(e)}'})
-        finally:
-            if os.path.exists(full_pdf_path):
-                os.remove(full_pdf_path)
+            print(f"Error procesando grupos: {str(e)}")
+            if default_storage.exists(pdf_path):
+                default_storage.delete(pdf_path)
+            return JsonResponse({'status':'error','mensaje':str(e)})
 
     return render(request, 'dashboard.html')

@@ -62,12 +62,16 @@ app.post('/crear_grupo', async (req, res) => {
     // 3) Crear el grupo
     console.log('Iniciando createGroup()... con nombre:', nombre_grupo);
     const group = await client.createGroup(nombre_grupo, chatIds);
-    
 
+    console.log('Grupo creado:', group);
+    console.log('ID del grupo:', group.gid._serialized);
+    const id = group.gid._serialized;
+    console.log('Descripción del grupo:', descripcion);
 
-    // 6) Responder al cliente HTTP
     return res.json({
       status: 'ok',
+        group_id: id,
+        group_name: nombre_grupo
     });
 
   } catch (e) {
@@ -76,7 +80,62 @@ app.post('/crear_grupo', async (req, res) => {
   }
 });
 
+// Ruta para agregar participantes a un grupo existente
+app.post('/agregar_participantes', async (req, res) => {
+  const { group_id, miembros = [] } = req.body;
+
+  try {
+    if (!group_id) {
+      return res.status(400).json({ status: 'error', error: 'El ID del grupo es requerido.' });
+    }
+
+    // 1) Obtener el chat por ID
+    const chat = await client.getChatById(group_id);
+    if (!chat?.isGroup) {
+      return res.status(400).json({ status: 'error', error: 'El ID proporcionado no corresponde a un grupo.' });
+    }
+
+    // 2) Resolver cada número a JID válido
+    const toAdd = [];
+    const invalidos = [];
+    for (let num of miembros) {
+      const contact = await client.getNumberId(num);
+      if (contact) {
+        toAdd.push(contact._serialized);
+      } else {
+        invalidos.push(num);
+      }
+    }
+
+    if (invalidos.length) {
+      return res.status(400).json({
+        status: 'error',
+        error: `Los siguientes números no han iniciado chat y no pueden agregarse: ${invalidos.join(', ')}`
+      });
+    }
+
+    if (!toAdd.length) {
+      return res.status(400).json({ status: 'error', error: 'No hay participantes válidos para agregar.' });
+    }
+
+    console.log('Agregando a:', toAdd);
+
+    // 3) Agregar participantes
+    await chat.addParticipants(toAdd);
+
+
+    return res.json({
+      status: 'ok',
+    });
+
+  } catch (e) {
+    console.error('Error en /agregar_participantes:', e);
+    return res.status(500).json({ status: 'error', error: e.message });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
+
